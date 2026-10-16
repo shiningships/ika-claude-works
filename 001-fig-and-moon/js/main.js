@@ -371,10 +371,30 @@
     });
   });
 
-  // bottle: tilt + mist
+  // bottle: real 3D (default, WebGL) → falls back to the transparent photo; ?bottle=cutout / ?bottle=original for comparison
   const frameEl = $('#bottle-frame'), mist = $('#mist'), mx = mist.getContext('2d');
+  const variant = new URLSearchParams(location.search).get('bottle') || '3d';
+  const useCut = variant !== 'original', use3d = variant === '3d';
+  let bottle3d = null;
+  if (variant === 'original') {                       // original studio photo (arch frame) — comparison only
+    frameEl.classList.remove('is-cutout', 'is-3d');
+    const bi = $('img', frameEl); bi.src = 'assets/fig-moon-bottle.png'; bi.width = 1024; bi.height = 1536;
+    $('.reflect', frameEl).removeAttribute('src');
+  } else if (!use3d) frameEl.classList.remove('is-3d');
+  if (use3d) {
+    // load Three.js + the model only when the section is about to be seen
+    let started = false;
+    const start = () => {
+      if (started) return; started = true;
+      const sc = document.createElement('script'); sc.src = 'js/bottle3d.js';
+      sc.onload = () => window.Bottle3D.init(frameEl, $('#bottle-gl'), { reduce }).then(api => { bottle3d = api; }).catch(() => frameEl.classList.remove('is-3d'));
+      sc.onerror = () => frameEl.classList.remove('is-3d');
+      document.head.appendChild(sc);
+    };
+    if ('IntersectionObserver' in window) { const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { start(); io.disconnect(); } }, { rootMargin: '900px 0px' }); io.observe(frameEl); } else start();
+  }
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if (finePointer && !reduce) {
+  if (finePointer && !reduce && !use3d) {
     frameEl.addEventListener('pointermove', e => {
       const r = frameEl.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
       frameEl.classList.add('is-tilting');
@@ -383,29 +403,53 @@
     });
     frameEl.addEventListener('pointerleave', () => { frameEl.classList.remove('is-tilting'); frameEl.style.setProperty('--rx', '0deg'); frameEl.style.setProperty('--ry', '0deg'); });
   }
+
+  /* mist: a fine, cool spray — pale droplets + a few gold glints + soft vapour, drawn additively */
   let mp = [], mraf = 0;
-  function sizeMist() { const r = frameEl.getBoundingClientRect(); const d = Math.min(devicePixelRatio || 1, 2); mist.width = r.width * d; mist.height = r.height * d; mx.setTransform(d, 0, 0, d, 0, 0); }
+  function sizeMist() { const d = Math.min(devicePixelRatio || 1, 2); mist.width = mist.clientWidth * d; mist.height = mist.clientHeight * d; mx.setTransform(d, 0, 0, d, 0, 0); }
   function spray() {
     frameEl.classList.add('has-pressed'); sizeMist();
-    const w = frameEl.clientWidth, h = frameEl.clientHeight, n = reduce ? 18 : 90;
-    for (let i = 0; i < n; i++) {
-      const a = -Math.PI / 2 + (rnd() - .5) * 1.1 + .35, v = 1.2 + rnd() * 3.2;
-      mp.push({ x: w * .505, y: h * .3, vx: Math.cos(a) * v, vy: Math.sin(a) * v - .2, life: 1, dec: .008 + rnd() * .014, r: 4 + rnd() * 14, d: rnd() });
+    const w = mist.clientWidth, h = mist.clientHeight, gl = use3d && frameEl.classList.contains('gl-ready') && bottle3d;
+    // nozzle: collar of the 3D bottle (follows the rotation) or a fixed spot on the photo
+    const o = gl ? bottle3d.project(1.0, 3.3, .3)
+      : use3d ? { x: w * .5, y: h * ((.225 + .06) / 1.12), facing: 0 }      // wide canvas box (3D variant before WebGL is ready)
+      : { x: w * .505, y: h * (useCut ? .225 : .3), facing: 0 };
+    const sx = o.x, sy = o.y;
+    const lean = gl ? o.facing * .9 : 0;                         // spray leans the way the bottle faces
+    const base = -.42 + lean;                                    // out of the neck, fanning up and to the right
+    const droplets = reduce ? 50 : 300, vapour = reduce ? 8 : 30;
+    for (let i = 0; i < droplets; i++) {
+      const a = base + (rnd() - .5) * 1.0, v = 3.4 + rnd() * 8.5, gold = rnd() < .1;
+      mp.push({ k: 0, x: sx, y: sy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, dec: .009 + rnd() * .014, r: .8 + rnd() * 2.2, c: gold ? [255, 226, 160] : (rnd() < .35 ? [255, 226, 240] : [232, 228, 255]), tw: rnd() * 6.28 });
+    }
+    for (let i = 0; i < vapour; i++) {
+      const a = base + (rnd() - .5) * .8, v = 2.2 + rnd() * 4.6;
+      mp.push({ k: 1, x: sx, y: sy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 1, dec: .007 + rnd() * .007, r: 12 + rnd() * 22, c: [226, 218, 255], tw: 0 });
     }
     if (!mraf) mraf = requestAnimationFrame(tickMist);
   }
   function tickMist() {
-    mx.clearRect(0, 0, mist.width, mist.height);
+    mx.clearRect(0, 0, mist.clientWidth, mist.clientHeight);
+    mx.globalCompositeOperation = useCut ? 'lighter' : 'source-over';
     mp = mp.filter(p => p.life > 0);
     for (const p of mp) {
-      p.x += p.vx; p.y += p.vy; p.vx *= .965; p.vy = p.vy * .965 - .012; p.life -= p.dec; p.r += .22;
-      const g = mx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
-      const a = Math.max(0, p.life) * .55;
-      g.addColorStop(0, `rgba(255,240,205,${a})`); g.addColorStop(.5, `rgba(236,196,120,${a * .5})`); g.addColorStop(1, 'rgba(236,196,120,0)');
-      mx.fillStyle = g; mx.beginPath(); mx.arc(p.x, p.y, p.r, 0, 6.283); mx.fill();
+      p.x += p.vx; p.y += p.vy; p.life -= p.dec;
+      if (p.k === 0) {
+        p.vx *= .972; p.vy = p.vy * .972 - .014;
+        const a = Math.max(0, p.life) * (.55 + .35 * Math.sin(p.tw + p.life * 18)) * (useCut ? 1 : .8);
+        const c = useCut ? p.c : [196, 138, 168];
+        mx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a})`; mx.beginPath(); mx.arc(p.x, p.y, p.r, 0, 6.283); mx.fill();
+      } else {
+        p.vx *= .97; p.vy = p.vy * .97 - .01; p.r += .5;
+        const a = Math.max(0, p.life) * (useCut ? .05 : .1), c = useCut ? p.c : [214, 160, 190];
+        const g = mx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        g.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a})`); g.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+        mx.fillStyle = g; mx.beginPath(); mx.arc(p.x, p.y, p.r, 0, 6.283); mx.fill();
+      }
     }
+    mx.globalCompositeOperation = 'source-over';
     mraf = mp.length ? requestAnimationFrame(tickMist) : 0;
-    if (!mp.length) mx.clearRect(0, 0, mist.width, mist.height);
+    if (!mp.length) mx.clearRect(0, 0, mist.clientWidth, mist.clientHeight);
   }
   frameEl.addEventListener('click', spray);
   frameEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); spray(); } });

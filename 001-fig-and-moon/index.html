@@ -86,17 +86,54 @@
       <div class="notes-grid reveal">
         <div class="moon-phase" id="moon-phase" data-phase="0">
           <div class="mp-halo"></div>
-          <svg viewBox="0 0 200 200" role="img" aria-label="月の満ち欠けのイラスト">
+          <svg viewBox="0 0 200 200" role="img" aria-label="時間帯のイラスト。夕暮れは沈む太陽、真夜中は満月、夜明けは昇る朝日">
             <defs>
-              <linearGradient id="mpg" x1="0" y1="0" x2="1" y2="1">
+              <linearGradient id="g-moon" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0" stop-color="#f6e2ae"/><stop offset=".55" stop-color="#d9b06a"/><stop offset="1" stop-color="#b98c45"/>
               </linearGradient>
-              <mask id="mpm" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
-                <rect width="200" height="200" fill="#fff"/>
-                <circle id="mp-shadow" cx="100" cy="100" r="86" fill="#000"/>
-              </mask>
+              <linearGradient id="g-dusk" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffd9a0"/><stop offset=".55" stop-color="#f4a070"/><stop offset="1" stop-color="#d9607a"/>
+              </linearGradient>
+              <linearGradient id="g-dawn" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#fff6dc"/><stop offset=".6" stop-color="#ffd9b0"/><stop offset="1" stop-color="#f7aab0"/>
+              </linearGradient>
+              <clipPath id="c-dusk"><rect x="0" y="0" width="200" height="132"/></clipPath>
+              <clipPath id="c-dawn"><rect x="0" y="0" width="200" height="136"/></clipPath>
             </defs>
-            <circle cx="100" cy="100" r="86" fill="url(#mpg)" mask="url(#mpm)"/>
+
+            <!-- 夕暮れ: 地平線に沈む太陽 -->
+            <g class="ill ill-dusk">
+              <g stroke="#f4b078" stroke-width="2.2" stroke-linecap="round" opacity=".85">
+                <path d="M100 44v-14M62 56l-9-10M138 56l9-10M38 82l-13-5M162 82l13-5M31 108h-14M169 108h14"/>
+              </g>
+              <circle cx="100" cy="132" r="58" fill="url(#g-dusk)" clip-path="url(#c-dusk)"/>
+              <path d="M16 132h168" stroke="#e8b886" stroke-width="2" stroke-linecap="round"/>
+              <g stroke="#f0a070" stroke-linecap="round" opacity=".8">
+                <path d="M62 144h76" stroke-width="3"/><path d="M74 156h52" stroke-width="2.6" opacity=".8"/>
+                <path d="M86 167h28" stroke-width="2.2" opacity=".6"/><path d="M93 177h14" stroke-width="2" opacity=".4"/>
+              </g>
+              <path d="M28 62c10-6 20-6 30 0M146 40c9-5 18-5 27 0" stroke="#f1b99a" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".6"/>
+              <g fill="#ffe7c4"><circle cx="160" cy="26" r="1.6" opacity=".7"/><circle cx="36" cy="30" r="1.2" opacity=".5"/></g>
+            </g>
+
+            <!-- 真夜中: 満月 -->
+            <g class="ill ill-night">
+              <circle cx="100" cy="100" r="86" fill="url(#g-moon)"/>
+            </g>
+
+            <!-- 夜明け: 昇る朝日と明けの明星 -->
+            <g class="ill ill-dawn">
+              <g stroke="#ffe3b8" stroke-width="2" stroke-linecap="round" opacity=".9">
+                <path d="M100 66V50M71 76l-9-11M129 76l9-11M48 96l-14-7M152 96l14-7M36 118H20M164 118h16"/>
+              </g>
+              <circle cx="100" cy="144" r="46" fill="url(#g-dawn)" clip-path="url(#c-dawn)"/>
+              <path d="M16 136h168" stroke="#f0cfae" stroke-width="2" stroke-linecap="round"/>
+              <g stroke="#f7c9b8" stroke-linecap="round" opacity=".75">
+                <path d="M70 148h60" stroke-width="2.6"/><path d="M82 159h36" stroke-width="2.2" opacity=".7"/><path d="M92 170h16" stroke-width="2" opacity=".5"/>
+              </g>
+              <path d="M46 40 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" fill="#fff2cf"/>
+              <path d="M158 38a13 13 0 1 0 9 22a10 10 0 1 1 -9 -22z" fill="#e9dcc0" opacity=".85"/>
+            </g>
           </svg>
           <p class="mp-label" id="mp-label">夕暮れ ・ トップノート</p>
         </div>
@@ -132,8 +169,11 @@
   <!-- BOTTLE -->
   <section class="bottle" id="bottle">
     <div class="wrap bottle-grid">
-      <div class="bottle-frame reveal" id="bottle-frame" tabindex="0" role="button" aria-label="ボトルを押すと、ミストが舞います">
-        <img src="assets/fig-moon-bottle.png" width="1024" height="1536" alt="FIG &amp; MOON オードパルファム 50 mL。ブラッシュドゴールドのキャップと透明な角型のガラス瓶に、金のイチジクと三日月が描かれたクリーム色のラベルが貼られている" decoding="async">
+      <div class="bottle-frame reveal is-cutout is-3d" id="bottle-frame" tabindex="0" role="button" aria-label="ボトルを押すと、ミストが舞います">
+        <img src="assets/fig-moon-bottle-cutout.png" width="664" height="1220" alt="FIG &amp; MOON オードパルファム 50 mL。ブラッシュドゴールドのキャップと透明な角型のガラス瓶に、金のイチジクと三日月が描かれたクリーム色のラベルが貼られている" decoding="async">
+        <span class="floor" aria-hidden="true"></span>
+        <img class="reflect" src="assets/fig-moon-bottle-cutout.png" alt="" aria-hidden="true">
+        <canvas class="bottle-gl" id="bottle-gl" aria-hidden="true"></canvas>
         <span class="glare" aria-hidden="true"></span>
         <canvas class="mist" id="mist" aria-hidden="true"></canvas>
         <span class="press-hint" aria-hidden="true">ボトルをタップ</span>
