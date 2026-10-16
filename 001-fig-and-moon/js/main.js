@@ -210,6 +210,7 @@
   const GOLD = [214, 168, 86], BRIGHT = [255, 230, 166];
   let t0 = performance.now(), last = t0;
 
+  const dockEl = $('#bottle-frame'); let dock = 0;
   function frame(now) {
     requestAnimationFrame(frame);
     const t = (now - t0) / 1000, dt = Math.min(.05, (now - last) / 1000); last = now;
@@ -243,10 +244,22 @@
 
     if (!P) return;
     const mc = { x: lerp(V.moonCx, V.moonEndCx, m), y: lerp(V.moonCy, V.moonEndCy, m), r: lerp(V.moonR, V.moonEndR, m) };
+    // while the bottle is on screen the moon "docks" beside the bottle's shoulder instead of sitting over the heading in the corner
+    const fr = dockEl.getBoundingClientRect();
+    const wTarget = m > .98 ? smooth(clamp((Math.min(fr.bottom, V.h) - Math.max(fr.top, 0)) / Math.max(1, fr.height)), .12, .62) : 0;
+    dock += (wTarget - dock) * .1;                                 // eased, so the moon never jumps
+    if (dock > .5) {                                               // dissolve-move: fade out in the corner, reappear by the bottle (no flight across the text)
+      mc.r *= .82;                                                 // a little smaller beside the bottle
+      const narrow = V.w < 700;                                    // phone: no room beside the bottle → rest in the space above its shoulder
+      const tx = narrow ? fr.left + fr.width * .78 : fr.left + fr.width * .84 + mc.r * 1.8;
+      const ty = narrow ? fr.top - mc.r * .9 : fr.top + fr.height * .075 + mc.r * .2;
+      mc.x = Math.min(tx, V.w - mc.r * 1.3); mc.y = ty;
+    }
+    const dimMul = Math.pow(Math.abs(1 - 2 * clamp(dock, 0, 1)), 1.4);   // 1 → 0 → 1 across the hand-over
     const formed = smooth(p, .72, 1);
     // moon halo
     if (formed > 0) {
-      const ha = formed * (.2 + .45 * night);
+      const ha = formed * (.2 + .45 * night) * dimMul;
       const gr = cx.createRadialGradient(mc.x - mc.r * .25, mc.y, 0, mc.x - mc.r * .25, mc.y, mc.r * 2.3);
       gr.addColorStop(0, `rgba(255,222,150,${(ha * .5).toFixed(3)})`); gr.addColorStop(.4, `rgba(255,200,130,${(ha * .18).toFixed(3)})`); gr.addColorStop(1, 'rgba(255,200,130,0)');
       cx.globalCompositeOperation = 'lighter'; cx.fillStyle = gr; cx.fillRect(mc.x - mc.r * 3, mc.y - mc.r * 3, mc.r * 6, mc.r * 6); cx.globalCompositeOperation = 'source-over';
@@ -287,7 +300,7 @@
         Y += Math.cos(t * 1.9 + P.sd[i] * 22 + e * 6) * turb * V.figH * .03;
         lit = smooth(q, 0, .3);
         size = lerp(P.sz[i] * sizeFig, P.sz[i] * sizeMoon * .9, e) * (1 + .8 * Math.sin(Math.PI * e));
-        if (e >= 1) { const tw = .5 + .5 * Math.sin(t * 2 + P.sd[i] * 40); alpha = lerp(.78, 1, tw); size *= lerp(.85, 1.15, tw); }
+        if (e >= 1) { const tw = .5 + .5 * Math.sin(t * 2 + P.sd[i] * 40); alpha = lerp(.78, 1, tw) * dimMul; size *= lerp(.85, 1.15, tw); }
       }
       let r = P.r[i], g = P.g[i], b = P.b[i];
       if (lit > 0) { const k = .86 + P.sd[i] * .2; r = lerp(r, Math.min(255, bright[0] * k), lit); g = lerp(g, Math.min(255, bright[1] * k), lit); b = lerp(b, Math.min(255, bright[2] * k), lit); }
