@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FIG &amp; MOON — 月夜の果樹園</title>
+<meta name="description" content="FIG &amp; MOON は、月夜の果樹園をテーマにした架空の香水ブランドの体験型デモサイトです。スクロールすると、昼から夜へ。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23221a44'/%3E%3Cpath d='M40 12a22 22 0 1 0 0 40a18 18 0 1 1 0-40z' fill='%23e3c07a'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&family=Shippori+Mincho:wght@400;500&family=Zen+Kaku+Gothic+New:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="sky" id="sky" aria-hidden="true"><div class="sun" id="sun"></div></div>
+<svg class="orchard" id="orchard" viewBox="0 0 1600 480" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+<canvas class="fx" id="fx" aria-hidden="true"></canvas>
+
+<a class="skip" href="#story">本文へ移動</a>
+
+<header class="site-header" id="top-bar">
+  <a class="brand" href="#hero" aria-label="FIG &amp; MOON トップへ">FIG <span>&amp;</span> MOON</a>
+  <nav class="nav" id="nav" aria-label="メインメニュー">
+    <a href="#story" data-spy="story">物語</a>
+    <a href="#notes" data-spy="notes">香り</a>
+    <a href="#bottle" data-spy="bottle">ボトル</a>
+    <a href="#label" data-spy="label">ラベル</a>
+    <a href="#reserve" data-spy="reserve" class="nav-cta">予約</a>
+  </nav>
+  <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav" aria-label="メニューを開く"><i></i><i></i></button>
+</header>
+
+<aside class="time-rail" aria-hidden="true">
+  <span>昼</span>
+  <div class="rail-track"><b id="rail-dot"></b></div>
+  <span>夜</span>
+</aside>
+
+<main>
+  <!-- HERO: pinned stage, fig → particles → crescent moon -->
+  <section class="hero" id="hero" aria-label="FIG &amp; MOON">
+    <div class="hero-stage">
+      <p class="eyebrow hero-eyebrow" id="h-eyebrow">Eau de Parfum <i></i> The Moonlit Orchard</p>
+      <h1 class="wordmark" id="h-title">FIG <em>&amp;</em> MOON</h1>
+      <p class="hero-sub" id="h-sub">月夜の果樹園へ、ようこそ</p>
+      <p class="scroll-hint" id="h-hint"><span>Scroll</span><i></i></p>
+      <div class="hero-caption" id="h-caption">
+        <p class="eyebrow">Moonrise <span class="ja">月の出</span></p>
+        <h2>イチジクは月になり、<br>長い夜がはじまる。</h2>
+        <p class="ja">そのまま下へ。果樹園の奥へ進みます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="story" id="story">
+    <div class="wrap">
+      <article class="scene reveal">
+        <p class="eyebrow">I <span class="ja">熟す</span> <span class="en">Ripening</span></p>
+        <h2>陽だまりで、<br>イチジクは熟していく。</h2>
+        <p>果実の皮に残る陽のぬくもり。指先でつぶした若葉の、青い香り。その奥に、ほんのりミルクと蜂蜜。果樹園はまだ、秘密を果実の中にしまっています。</p>
+      </article>
+      <article class="scene scene-r reveal">
+        <p class="eyebrow">II <span class="ja">昇る</span> <span class="en">Rising</span></p>
+        <h2>光が空へほどけ、<br>甘さが昇っていく。</h2>
+        <p>日が傾くと、やわらかな金色はそっと枝を離れて空へ。あとに残るのは、葉の影と、ひんやりした草の気配だけ。</p>
+      </article>
+      <article class="scene reveal">
+        <p class="eyebrow">III <span class="ja">月</span> <span class="en">Moonlight</span></p>
+        <h2>月が、果実の<br>かわりに浮かぶ。</h2>
+        <p>イチジクがあった場所に、三日月がひとつ。足もとの木々は静かに光ります。FIG &amp; MOON は、そんな夜のひとときをガラスに閉じ込めた香り。熟していて、銀色で、少しだけ幻のような。</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="notes" id="notes">
+    <div class="wrap">
+      <header class="sec-head reveal">
+        <p class="eyebrow">Scent <span class="ja">香り</span></p>
+        <h2>果樹園の、三つの時間</h2>
+        <p class="lead">時間を選んでみてください。月も一緒に姿を変えます。</p>
+      </header>
+
+      <div class="notes-grid reveal">
+        <div class="moon-phase" id="moon-phase" data-phase="0">
+          <div class="mp-halo"></div>
+          <svg viewBox="0 0 200 200" role="img" aria-label="月の満ち欠けのイラスト">
+            <defs>
+              <linearGradient id="mpg" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f6e2ae"/><stop offset=".55" stop-color="#d9b06a"/><stop offset="1" stop-color="#b98c45"/>
+              </linearGradient>
+              <mask id="mpm" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="200">
+                <rect width="200" height="200" fill="#fff"/>
+                <circle id="mp-shadow" cx="100" cy="100" r="86" fill="#000"/>
+              </mask>
+            </defs>
+            <circle cx="100" cy="100" r="86" fill="url(#mpg)" mask="url(#mpm)"/>
+          </svg>
+          <p class="mp-label" id="mp-label">夕暮れ ・ トップノート</p>
+        </div>
+
+        <div class="notes-panel">
+          <div class="tabs" role="tablist" aria-label="香りの時間">
+            <button role="tab" id="tab-0" aria-selected="true" aria-controls="panel-0" data-i="0"><span>夕暮れ</span><small>Top</small></button>
+            <button role="tab" id="tab-1" aria-selected="false" aria-controls="panel-1" data-i="1" tabindex="-1"><span>真夜中</span><small>Heart</small></button>
+            <button role="tab" id="tab-2" aria-selected="false" aria-controls="panel-2" data-i="2" tabindex="-1"><span>夜明け</span><small>Last</small></button>
+          </div>
+
+          <article class="tabpanel" id="panel-0" role="tabpanel" aria-labelledby="tab-0">
+            <h3>最初のひと息</h3>
+            <p>ひんやりと青く、明るく。日が落ちるころ、葉からたちのぼるはじまりの香り。気づいたときには、もう淡く消えていきます。</p>
+            <ul class="chips"><li>イチジクの葉</li><li>ベルガモット</li><li>ピンクペッパー</li></ul>
+          </article>
+          <article class="tabpanel" id="panel-1" role="tabpanel" aria-labelledby="tab-1" hidden>
+            <h3>熟れた時間</h3>
+            <p>ミルキーで蜜のような果実に、粉っぽい花が重なります。香りの中心にあたる、肌にのる月明かりのようなやわらかさ。</p>
+            <ul class="chips"><li>完熟イチジク</li><li>ジャスミン</li><li>オリス</li></ul>
+          </article>
+          <article class="tabpanel" id="panel-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+            <h3>あとに残るもの</h3>
+            <p>夜が明けたあとも続く、あたたかな木とアンバー。袖や襟にそっと残る、静かな余韻です。</p>
+            <ul class="chips"><li>サンダルウッド</li><li>アンバー</li><li>ホワイトムスク</li></ul>
+          </article>
+          <p class="fine">※ 香りの紹介は、このコンセプトサイトのための架空の文章です。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTLE -->
+  <section class="bottle" id="bottle">
+    <div class="wrap bottle-grid">
+      <div class="bottle-frame reveal" id="bottle-frame" tabindex="0" role="button" aria-label="ボトルを押すと、ミストが舞います">
+        <img src="assets/fig-moon-bottle.png" width="1024" height="1536" alt="FIG &amp; MOON オードパルファム 50 mL。ブラッシュドゴールドのキャップと透明な角型のガラス瓶に、金のイチジクと三日月が描かれたクリーム色のラベルが貼られている" decoding="async">
+        <span class="glare" aria-hidden="true"></span>
+        <canvas class="mist" id="mist" aria-hidden="true"></canvas>
+        <span class="press-hint" aria-hidden="true">ボトルをタップ</span>
+      </div>
+      <div class="bottle-copy reveal">
+        <p class="eyebrow">Bottle <span class="ja">ボトル</span></p>
+        <h2>FIG <em>&amp;</em> MOON</h2>
+        <p class="sub">Eau de Parfum <i>・</i> 50 mL</p>
+        <p>肩の角がすっきりした、透明な角型のガラス瓶。ほんのりローズ色の液体を、ブラッシュドゴールドのキャップが静かに閉じます。ラベルには、イチジクの茎が三日月へとつながる、ひとすじの金線。この香りの物語がそのまま描かれています。</p>
+        <dl class="spec">
+          <div><dt>容量</dt><dd>50 mL スプレー</dd></div>
+          <div><dt>濃度</dt><dd>オードパルファム</dd></div>
+          <div><dt>キャップ</dt><dd>ブラッシュドゴールド</dd></div>
+          <div><dt>ガラス</dt><dd>透明（ローズ色の液体）</dd></div>
+        </dl>
+        <a class="btn" href="#reserve">サンプルを予約する</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LABEL -->
+  <section class="label-sec" id="label">
+    <div class="wrap label-grid">
+      <div class="label-copy reveal">
+        <p class="eyebrow">Label <span class="ja">ラベル</span></p>
+        <h2>果実から月へ、<br>ひと筆の金線。</h2>
+        <p>金箔のイチジク、プラム色の文字、キャンドルのようにあたたかいクリーム色の紙。ラベルの上をなぞると、金が光を拾います。イチジクを空へ舞い上げた、あの光です。</p>
+        <ul class="label-list">
+          <li><b>金</b>イチジク・葉・三日月は、金のエンボス</li>
+          <li><b>プラム</b>深いイチジク色の、すっとしたセリフ体</li>
+          <li><b>クリーム</b>手ざわりのある、ぬくもり色の紙</li>
+        </ul>
+      </div>
+      <div class="label-card reveal" id="label-card">
+        <img src="assets/fig-moon-label.png" width="1024" height="1536" alt="FIG &amp; MOON のラベル。茎が三日月につながる金のイチジクの下に、FIG &amp; MOON、The Moonlit Orchard、50 mL の文字" decoding="async">
+        <span class="foil" aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESERVE (mock) -->
+  <section class="reserve" id="reserve">
+    <div class="wrap reserve-wrap reveal">
+      <p class="eyebrow">Moonlit List <span class="ja">予約</span></p>
+      <h2>果樹園が目を覚ます日に、<br>そばにいられるように。</h2>
+      <p class="lead">メールアドレスを登録すると、実際のサービスならサンプルをお届けします。これはコンセプト用のデモで、送信も保存もされません。</p>
+      <form class="reserve-form" id="reserve-form" novalidate>
+        <label class="sr" for="email">メールアドレス</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="メールアドレス" required>
+        <button class="btn btn-solid" type="submit">登録する</button>
+      </form>
+      <p class="form-msg" id="form-msg" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="brand brand-lg">FIG <span>&amp;</span> MOON</p>
+    <p class="fine">架空のブランドによる、制作デモ用のサイトです。商品の販売や個人情報の収集は行っていません。</p>
+    <button class="to-top" id="to-top" type="button">昼にもどる ↑</button>
+  </div>
+</footer>
+
+<script src="js/fig-data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
